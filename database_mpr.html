@@ -5,106 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DATABASE PERMINTAAN MATERIAL REJECT</title>
 <style>
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
-    background-color: #f4f7f9;
-}
-.container {
-    width: 95%;
-    margin: auto;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-h1 {
-    color: #808080;
-    text-align: center;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #808080;
-    padding-bottom: 10px;
-}
-table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { border:1px solid #dee2e6; padding:12px 8px; font-size:0.9em; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:20px; background:#f4f7f9; }
+.container { width:95%; margin:auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+h1 { color:#808080; text-align:center; margin-bottom:25px; border-bottom:2px solid #808080; padding-bottom:10px; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { border:1px solid #dee2e6; padding:8px; font-size:0.9em; }
 th { background:#808080; color:white; text-align:center; }
-#databaseBody td:nth-child(1),
-#databaseBody td:nth-child(2),
-#databaseBody td:nth-child(3),
-#databaseBody td:nth-child(4),
-#databaseBody td:nth-child(5) { text-align:center; }
-#databaseBody td:nth-child(4) { text-align:right; }
-#databaseBody td:nth-child(8) { text-align:center; }
-.doc-link { color:#808080; text-decoration:none; font-weight:bold; cursor:pointer; }
-.doc-link:hover { text-decoration:underline; }
 tr:nth-child(even){ background-color:#f8f9fa; }
 .material-list { font-size:0.85em; max-height:50px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
-.status-badge { padding:4px 8px; border-radius:3px; font-weight:bold; color:white; }
-.status-Submitted { background-color:#b0b0b0; color:#343a40; }
-.status-InProcess { background-color:#808080; }
-.status-Finished { background-color:#28a745; }
-.action-select, .action-button {
-    padding:5px 8px; border-radius:4px; border:1px solid #ccc; font-size:0.9em; cursor:pointer; margin-right:5px;
-}
-.delete-button { background-color:#dc3545; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-size:0.85em; }
-.edit-button { background-color:#ffc107; color:#000; border:none; border-radius:4px; padding:6px 10px; cursor:pointer; font-size:0.85em; }
-.aksi-lain button { margin-top:3px; }
+.action-container { display:flex; gap:5px; align-items:center; justify-content:center; }
+.action-select { padding:4px 6px; border-radius:4px; border:1px solid #ccc; font-size:0.85em; cursor:pointer; }
+.action-button { padding:4px 6px; border-radius:4px; border:none; font-size:0.85em; cursor:pointer; }
+.edit-button { background:#ffc107; color:#000; width:100%; margin-top:3px; }
+.delete-button { background:#dc3545; color:white; width:100%; margin-top:3px; }
+.aksi-lain { display:none; margin-top:3px; }
 .modal { display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); }
 .modal-content { background:#fff; margin:5% auto; padding:20px; width:80%; max-width:700px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2); }
 .close-button { float:right; font-size:28px; font-weight:bold; color:#aaa; cursor:pointer; }
 .close-button:hover { color:#000; }
-.detail-material-table { width:100%; border-collapse:collapse; margin-top:10px; }
-.detail-material-table th, .detail-material-table td { border:1px solid #dee2e6; padding:8px; text-align:center; }
-#statusFilter {
-    padding:5px 10px;
-    border-radius:4px;
-    border:1px solid #808080;
-}
-.home-link {
-    display:inline-block;
-    color:#808080;
-    text-decoration:none;
-    margin-bottom:10px;
-    font-weight:bold;
-}
+.info-table { border-collapse: collapse; width: 100%; font-size: 14px; margin-bottom: 10px; }
+.info-table td { padding: 3px 4px; vertical-align: top; }
+.info-table td:first-child { width: 150px; }
+.info-table td:nth-child(2) { width: 10px; }
+#printButton { background:#808080; color:white; padding:10px 15px; border:none; border-radius:4px; margin-top:15px; cursor:pointer; }
+#printButton:hover { background:#6c6c6c; }
+.home-link { display:inline-block; color:#808080; text-decoration:none; margin-bottom:10px; font-weight:bold; }
 .home-link:hover { text-decoration:underline; }
-
-#printButton {
-    background:#808080;
-    color:white;
-    padding:10px 15px;
-    border:none;
-    border-radius:4px;
-    margin-top:15px;
-    cursor:pointer;
-}
-#printButton:hover {
-    background:#6c6c6c;
-}
-
-.info-table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-.info-table td {
-    padding: 3px 4px;
-    vertical-align: top;
-}
-.info-table td:first-child {
-    width: 150px;
-}
-.info-table td:nth-child(2) {
-    width: 10px;
-}
-
 @media print {
-    body > *:not(.modal) { display:none !important; }
-    .modal { position:static; display:block !important; background:white; }
-    .modal-content { width:95% !important; border:none; box-shadow:none; margin:0; }
-    .close-button, #printButton { display:none !important; }
-    table, th, td { border:1px solid #000 !important; }
+    body>*:not(.modal){display:none!important;}
+    .modal{position:static; display:block!important; background:white;}
+    .modal-content{width:95%!important; border:none; box-shadow:none; margin:0;}
+    .close-button, #printButton{display:none!important;}
+    table, th, td{border:1px solid #000!important;}
 }
 </style>
 </head>
@@ -143,14 +75,12 @@ tr:nth-child(even){ background-color:#f8f9fa; }
     <div id="emptyMessage" style="display:none;">Belum ada data permintaan material</div>
 </div>
 
-<!-- ✅ Modal Preview -->
+<!-- Modal Preview -->
 <div id="previewModal" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeModal()">&times;</span>
         <div id="printArea">
             <h1 style="text-align:center; color:#808080; font-size:16px;">PERMINTAAN MATERIAL PENGGANTI REJECT</h1>
-
-            <!-- ✅ Informasi dokumen dalam tabel tanpa border -->
             <table class="info-table">
                 <tr><td>No. Dokumen</td><td>:</td><td><span id="modalDocNumber"></span></td></tr>
                 <tr><td>Tanggal</td><td>:</td><td><span id="modalDate"></span></td></tr>
@@ -159,7 +89,6 @@ tr:nth-child(even){ background-color:#f8f9fa; }
                 <tr><td>Buyer / Style</td><td>:</td><td><span id="modalBuyerStyle"></span></td></tr>
                 <tr><td>Keterangan Reject</td><td>:</td><td><span id="modalAlasanReject"></span></td></tr>
             </table>
-
             <table style="width:100%; border-collapse: collapse; margin-top:10px;">
                 <thead>
                     <tr style="background:#f8f9fa; text-align:center;">
@@ -175,7 +104,6 @@ tr:nth-child(even){ background-color:#f8f9fa; }
     </div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -190,155 +118,112 @@ const firebaseConfig = {
   appId: "1:663364522026:web:f48fb1ba0331695de83353"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db=firebase.firestore();
+const STATUS_OPTIONS=["Submitted","In Process","Finished"];
+let currentModalData=null;
 
-const STATUS_OPTIONS = ["Submitted", "In Process", "Finished"];
-let currentModalData = null;
+async function loadDatabase(){
+    const tbody=document.getElementById('databaseBody');
+    const emptyMsg=document.getElementById('emptyMessage');
+    tbody.innerHTML='';
+    const statusFilter=document.getElementById('statusFilter').value.trim();
+    const snapshot=await db.collection("mpr_requests").orderBy("tanggal_dibuat","desc").get();
+    if(snapshot.empty){ emptyMsg.style.display='block'; return; }
+    let anyRow=false;
+    snapshot.forEach((doc)=>{
+        const data=doc.data();
+        let docStatus=(data.status||"Submitted").trim();
+        if(statusFilter!=="All" && docStatus!==statusFilter) return;
+        anyRow=true;
+        const id=doc.id;
+        const row=tbody.insertRow();
+        const materialSummary=(data.detail_material||[]).map(item=>`${item.nama_barang} (${item.jumlah} ${item.satuan})`).join(',');
+        row.insertCell(0).innerHTML=`<a class="doc-link" onclick='showDetails(${JSON.stringify({...data,id})})'>${data.nomor_dokumen}</a>`;
+        row.insertCell(1).textContent=data.tanggal_dibuat||"-";
+        row.insertCell(2).textContent=data.pemohon||"-";
+        row.insertCell(3).textContent=data.departemen||"-";
+        row.insertCell(4).textContent=data.buyer_style||"-";
+        row.insertCell(5).textContent=materialSummary||"-";
+        row.insertCell(6).textContent=docStatus;
+        row.insertCell(7).textContent=data.keterangan||"-";
 
-async function loadDatabase() {
-    const tbody = document.getElementById('databaseBody');
-    const emptyMsg = document.getElementById('emptyMessage');
-    tbody.innerHTML = '';
-
-    const statusFilter = document.getElementById('statusFilter').value.trim();
-    const snapshot = await db.collection("mpr_requests").orderBy("tanggal_dibuat", "desc").get();
-    if (snapshot.empty) {
-        emptyMsg.style.display = 'block';
-        return;
-    }
-
-    let anyRow = false;
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        const docStatus = (data.status || "").trim();
-        if (statusFilter !== "All" && docStatus !== statusFilter) return;
-
-        anyRow = true;
-        const id = doc.id;
-        const row = tbody.insertRow();
-
-        const materialSummary = (data.detail_material || []).map(item =>
-            `${item.nama_barang} (${item.jumlah} ${item.satuan})`
-        ).join(', ');
-
-        row.insertCell(0).innerHTML = `<a class="doc-link" onclick='showDetails(${JSON.stringify({...data, id})})'>${data.nomor_dokumen}</a>`;
-        row.insertCell(1).textContent = data.tanggal_dibuat || "-";
-        row.insertCell(2).textContent = data.pemohon || "-";
-        row.insertCell(3).textContent = data.departemen || "-";
-        row.insertCell(4).textContent = data.buyer_style || "-";
-        const materialCell = row.insertCell(5);
-        materialCell.classList.add('material-list');
-        materialCell.textContent = materialSummary || "-";
-
-        const statusCell = row.insertCell(6);
-        statusCell.textContent = docStatus;
-        statusCell.style.textAlign = "center";
-
-        const ketCell = row.insertCell(7);
-        ketCell.textContent = data.keterangan || "-";
-        ketCell.style.textAlign = "center";
-
-        const actionCell = row.insertCell(8);
-        let selectHTML = `<select class="action-select" onchange="passwordProtectedAction(() => changeStatus('${id}', this.value))">`;
-        STATUS_OPTIONS.forEach(status => {
-            const sel = docStatus === status ? "selected" : "";
-            selectHTML += `<option value="${status}" ${sel}>${status}</option>`;
-        });
-        selectHTML += `</select>`;
-
-        selectHTML += `
-            <button class="action-button" onclick="toggleAksi(this)">⚙️ Aksi</button>
-            <div class="aksi-lain" style="display:none; margin-top:5px;">
-                <button class="edit-button" onclick="passwordProtectedAction(() => editKeterangan('${id}', '${data.keterangan || ''}'))">✏️ Keterangan</button>
-                <button class="delete-button" onclick="passwordProtectedAction(() => deleteRequest('${id}'))">🗑️ Hapus</button>
+        const actionCell=row.insertCell(8);
+        actionCell.style.textAlign="center";
+        let optionsHTML=STATUS_OPTIONS.map(s=>`<option value="${s}" ${docStatus===s?'selected':''}>${s}</option>`).join('');
+        actionCell.innerHTML=`
+            <div class="action-container">
+                <select class="action-select" onchange="passwordProtectedAction(()=>changeStatus('${id}',this.value))">
+                    ${optionsHTML}
+                </select>
+                <button class="action-button" onclick="toggleAksi(this)">⚙️ Aksi</button>
+            </div>
+            <div class="aksi-lain">
+                <button class="edit-button" onclick="passwordProtectedAction(()=>editKeterangan('${id}','${data.keterangan||''}'))">✏️ Keterangan</button>
+                <button class="delete-button" onclick="passwordProtectedAction(()=>deleteRequest('${id}'))">🗑️ Hapus</button>
             </div>
         `;
-        actionCell.innerHTML = selectHTML;
-        actionCell.style.textAlign = "center";
     });
-
-    emptyMsg.style.display = anyRow ? 'none' : 'block';
+    emptyMsg.style.display=anyRow?'none':'block';
 }
 
-function toggleAksi(button) {
-    const aksiLain = button.nextElementSibling;
-    aksiLain.style.display = aksiLain.style.display === "none" ? "block" : "none";
+function toggleAksi(button){
+    const aksiLain=button.parentElement.nextElementSibling;
+    aksiLain.style.display=aksiLain.style.display==="none"?"block":"none";
 }
 
-function passwordProtectedAction(callback) {
-  const pass = prompt("Masukkan password untuk melanjutkan:");
-  if (pass === "eland123") { 
-    callback();
-  } else if (pass === null) {
-    alert("Aksi dibatalkan.");
-  } else {
-    alert("Password salah!");
-  }
+function passwordProtectedAction(callback){
+    const pass=prompt("Masukkan password untuk melanjutkan:");
+    if(pass==="eland123"){ callback(); } 
+    else if(pass===null){ alert("Aksi dibatalkan."); } 
+    else{ alert("Password salah!"); }
 }
 
-async function editKeterangan(id, currentValue) {
-    const newKet = prompt("Masukkan keterangan baru:", currentValue || "");
-    if (newKet === null) return; 
-    await db.collection("mpr_requests").doc(id).update({ keterangan: newKet });
+async function changeStatus(id,newStatus){
+    if(!confirm(`Ubah status menjadi ${newStatus}?`)) return;
+    await db.collection("mpr_requests").doc(id).update({status:newStatus});
+    loadDatabase();
+}
+
+async function editKeterangan(id,currentValue){
+    const newKet=prompt("Masukkan keterangan baru:",currentValue||"");
+    if(newKet===null) return;
+    await db.collection("mpr_requests").doc(id).update({keterangan:newKet});
     alert("Keterangan berhasil diperbarui.");
     loadDatabase();
 }
 
-function showDetails(data) {
-    currentModalData = data;
-    document.getElementById('modalDocNumber').textContent = data.nomor_dokumen;
-    document.getElementById('modalDate').textContent = data.tanggal_dibuat || "-";
-    document.getElementById('modalPemohon').textContent = data.pemohon || "-";
-    document.getElementById('modalDepartemen').textContent = data.departemen || "-";
-    document.getElementById('modalBuyerStyle').textContent = data.buyer_style || "-";
-    document.getElementById('modalAlasanReject').textContent = data.alasan_reject || "-";
-
-    const materialBody = document.getElementById('modalMaterialBody');
-    materialBody.innerHTML = '';
-    (data.detail_material || []).forEach(item => {
-        const row = materialBody.insertRow();
-        const namaCell = row.insertCell(0);
-        const satuanCell = row.insertCell(1);
-        const jumlahCell = row.insertCell(2);
-
-        namaCell.textContent = item.nama_barang || "-";
-        satuanCell.textContent = item.satuan || "-";
-        jumlahCell.textContent = item.jumlah || "-";
-
-        // ✅ buat satuan & jumlah rata tengah
-        satuanCell.style.textAlign = "center";
-        jumlahCell.style.textAlign = "center";
-    });
-    document.getElementById('previewModal').style.display = "block";
-}
-
-function closeModal() {
-    document.getElementById('previewModal').style.display = "none";
-}
-
-function printRequest() {
-    if (!currentModalData) return;
-    window.print();
-}
-
-async function changeStatus(id, newStatus) {
-    if (!confirm(`Ubah status menjadi ${newStatus}?`)) return;
-    await db.collection("mpr_requests").doc(id).update({ status: newStatus });
-    loadDatabase();
-}
-
-async function deleteRequest(id) {
-    if (!confirm("Hapus permintaan ini secara permanen?")) return;
+async function deleteRequest(id){
+    if(!confirm("Hapus permintaan ini secara permanen?")) return;
     await db.collection("mpr_requests").doc(id).delete();
     loadDatabase();
 }
 
-window.onclick = function(e){
-    const modal = document.getElementById('previewModal');
-    if (e.target == modal) closeModal();
+function showDetails(data){
+    currentModalData=data;
+    document.getElementById('modalDocNumber').textContent=data.nomor_dokumen;
+    document.getElementById('modalDate').textContent=data.tanggal_dibuat||"-";
+    document.getElementById('modalPemohon').textContent=data.pemohon||"-";
+    document.getElementById('modalDepartemen').textContent=data.departemen||"-";
+    document.getElementById('modalBuyerStyle').textContent=data.buyer_style||"-";
+    document.getElementById('modalAlasanReject').textContent=data.alasan_reject||"-";
+
+    const materialBody=document.getElementById('modalMaterialBody');
+    materialBody.innerHTML='';
+    (data.detail_material||[]).forEach(item=>{
+        const row=materialBody.insertRow();
+        row.insertCell(0).textContent=item.nama_barang||"-";
+        row.insertCell(1).textContent=item.satuan||"-";
+        row.insertCell(2).textContent=item.jumlah||"-";
+        row.cells[1].style.textAlign="center";
+        row.cells[2].style.textAlign="center";
+    });
+    document.getElementById('previewModal').style.display="block";
 }
 
-document.addEventListener("DOMContentLoaded", loadDatabase);
+function closeModal(){ document.getElementById('previewModal').style.display="none"; }
+function printRequest(){ if(currentModalData) window.print(); }
+window.onclick=function(e){ if(e.target==document.getElementById('previewModal')) closeModal(); }
+document.addEventListener("DOMContentLoaded",loadDatabase);
 </script>
 
 </body>
