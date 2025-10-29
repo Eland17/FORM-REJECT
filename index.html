@@ -237,7 +237,7 @@ async function submitForm() {
     buyer_style: buyer,
     alasan_reject: alasan,
     detail_material: materials,
-    status: "In Process",
+    status: "Submitted",  // ✅ status otomatis jadi Submitted
     keterangan: "",
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   };
