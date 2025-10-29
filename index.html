@@ -143,7 +143,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ✅ Generate nomor MR aman, hanya sekali per session
+// ✅ Generate nomor MR: ambil dari database terakhir, simpan session, tidak bertambah saat reload
 async function generateMRNumber() {
   const docField = document.getElementById('docNumber');
   const dateField = document.getElementById('requestDate');
@@ -155,29 +155,29 @@ async function generateMRNumber() {
   const dateCode = `${year}${month}${day}`;
   dateField.value = today.toISOString().split('T')[0];
 
-  // cek sessionStorage dulu
+  // cek sessionStorage
   const storedMR = sessionStorage.getItem('currentMR');
   if (storedMR) {
     docField.value = storedMR;
     return;
   }
 
-  const counterRef = db.collection("mpr_requests").doc(String(year));
-
   try {
-    const newDocNumber = await db.runTransaction(async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
-      let nextNum = 1;
-      if (counterDoc.exists) {
-        const data = counterDoc.data();
-        nextNum = (data.lastNumber || 0) + 1;
-      }
-      transaction.set(counterRef, { lastNumber: nextNum }, { merge: true });
-      return `MR/${dateCode}/${String(nextNum).padStart(5, '0')}`;
-    });
+    const snapshot = await db.collection("mpr_requests")
+      .orderBy("timestamp", "desc")
+      .limit(1)
+      .get();
 
+    let nextNum = 1;
+    if (!snapshot.empty) {
+      const lastDoc = snapshot.docs[0].data();
+      const lastNumberStr = lastDoc.nomor_dokumen.split('/').pop();
+      nextNum = parseInt(lastNumberStr, 10) + 1;
+    }
+
+    const newDocNumber = `MR/${dateCode}/${String(nextNum).padStart(5, '0')}`;
     docField.value = newDocNumber;
-    sessionStorage.setItem('currentMR', newDocNumber); // simpan di session
+    sessionStorage.setItem('currentMR', newDocNumber);
   } catch (e) {
     console.error("Error generate MR number:", e);
     docField.value = "MR/ERROR";
