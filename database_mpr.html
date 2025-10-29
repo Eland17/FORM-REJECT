@@ -33,7 +33,8 @@ th { background:#808080; color:white; text-align:center; }
 #databaseBody td:nth-child(3),
 #databaseBody td:nth-child(4),
 #databaseBody td:nth-child(5) { text-align:center; }
-#databaseBody td:nth-child(4) { text-align:right; } /* Departemen rata kanan */
+#databaseBody td:nth-child(4) { text-align:right; }
+#databaseBody td:nth-child(8) { text-align:center; }
 .doc-link { color:#808080; text-decoration:none; font-weight:bold; cursor:pointer; }
 .doc-link:hover { text-decoration:underline; }
 tr:nth-child(even){ background-color:#f8f9fa; }
@@ -52,7 +53,6 @@ tr:nth-child(even){ background-color:#f8f9fa; }
 .modal-content { background:#fff; margin:5% auto; padding:20px; width:80%; max-width:700px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2); }
 .close-button { float:right; font-size:28px; font-weight:bold; color:#aaa; cursor:pointer; }
 .close-button:hover { color:#000; }
-.detail-group { margin-bottom:10px; padding:8px; border-left:3px solid #808080; background:#f8f9fa; }
 .detail-material-table { width:100%; border-collapse:collapse; margin-top:10px; }
 .detail-material-table th, .detail-material-table td { border:1px solid #dee2e6; padding:8px; text-align:center; }
 #statusFilter {
@@ -82,6 +82,23 @@ tr:nth-child(even){ background-color:#f8f9fa; }
     background:#6c6c6c;
 }
 
+.info-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.info-table td {
+    padding: 3px 4px;
+    vertical-align: top;
+}
+.info-table td:first-child {
+    width: 150px;
+}
+.info-table td:nth-child(2) {
+    width: 10px;
+}
+
 @media print {
     body > *:not(.modal) { display:none !important; }
     .modal { position:static; display:block !important; background:white; }
@@ -97,7 +114,6 @@ tr:nth-child(even){ background-color:#f8f9fa; }
     <a href="index.html" class="home-link">⬅️ Kembali ke Formulir</a>
     <h1>DATA PERMINTAAN MATERIAL REJECT</h1>
 
-    <!-- Filter Status -->
     <div style="margin-bottom:15px;">
         <label for="statusFilter">Filter Status: </label>
         <select id="statusFilter" onchange="loadDatabase()">
@@ -118,6 +134,7 @@ tr:nth-child(even){ background-color:#f8f9fa; }
                 <th>Buyer/Style</th>
                 <th>Material Diminta</th>
                 <th>Status</th>
+                <th>Keterangan</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -126,22 +143,23 @@ tr:nth-child(even){ background-color:#f8f9fa; }
     <div id="emptyMessage" style="display:none;">Belum ada data permintaan material</div>
 </div>
 
-<!-- Modal Preview -->
+<!-- ✅ Modal Preview -->
 <div id="previewModal" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeModal()">&times;</span>
         <div id="printArea">
             <h1 style="text-align:center; color:#808080; font-size:16px;">PERMINTAAN MATERIAL PENGGANTI REJECT</h1>
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <div><strong>No. Dokumen:</strong> <span id="modalDocNumber"></span></div>
-                <div><strong>Tanggal:</strong> <span id="modalDate"></span></div>
-            </div>
-            <div style="display:flex; gap:15px; margin-bottom:10px;">
-                <div style="flex:1;"><strong>Diajukan Oleh:</strong> <span id="modalPemohon"></span></div>
-                <div style="flex:1; text-align:right;"><strong>Departemen:</strong> <span id="modalDepartemen"></span></div>
-            </div>
-            <div style="margin-bottom:10px;"><strong>Buyer / Style:</strong> <span id="modalBuyerStyle"></span></div>
-            <div style="margin-bottom:10px;"><strong>Keterangan Reject:</strong> <span id="modalAlasanReject"></span></div>
+
+            <!-- ✅ Informasi dokumen dalam tabel tanpa border -->
+            <table class="info-table">
+                <tr><td>No. Dokumen</td><td>:</td><td><span id="modalDocNumber"></span></td></tr>
+                <tr><td>Tanggal</td><td>:</td><td><span id="modalDate"></span></td></tr>
+                <tr><td>Diajukan Oleh</td><td>:</td><td><span id="modalPemohon"></span></td></tr>
+                <tr><td>Departemen</td><td>:</td><td><span id="modalDepartemen"></span></td></tr>
+                <tr><td>Buyer / Style</td><td>:</td><td><span id="modalBuyerStyle"></span></td></tr>
+                <tr><td>Keterangan Reject</td><td>:</td><td><span id="modalAlasanReject"></span></td></tr>
+            </table>
+
             <table style="width:100%; border-collapse: collapse; margin-top:10px;">
                 <thead>
                     <tr style="background:#f8f9fa; text-align:center;">
@@ -216,7 +234,11 @@ async function loadDatabase() {
         statusCell.textContent = docStatus;
         statusCell.style.textAlign = "center";
 
-        const actionCell = row.insertCell(7);
+        const ketCell = row.insertCell(7);
+        ketCell.textContent = data.keterangan || "-";
+        ketCell.style.textAlign = "center";
+
+        const actionCell = row.insertCell(8);
         let selectHTML = `<select class="action-select" onchange="passwordProtectedAction(() => changeStatus('${id}', this.value))">`;
         STATUS_OPTIONS.forEach(status => {
             const sel = docStatus === status ? "selected" : "";
@@ -275,9 +297,17 @@ function showDetails(data) {
     materialBody.innerHTML = '';
     (data.detail_material || []).forEach(item => {
         const row = materialBody.insertRow();
-        row.insertCell(0).textContent = item.nama_barang || "-";
-        row.insertCell(1).textContent = item.satuan || "-";
-        row.insertCell(2).textContent = item.jumlah || "-";
+        const namaCell = row.insertCell(0);
+        const satuanCell = row.insertCell(1);
+        const jumlahCell = row.insertCell(2);
+
+        namaCell.textContent = item.nama_barang || "-";
+        satuanCell.textContent = item.satuan || "-";
+        jumlahCell.textContent = item.jumlah || "-";
+
+        // ✅ buat satuan & jumlah rata tengah
+        satuanCell.style.textAlign = "center";
+        jumlahCell.style.textAlign = "center";
     });
     document.getElementById('previewModal').style.display = "block";
 }
