@@ -31,6 +31,8 @@ tr:nth-child(even){ background-color:#f8f9fa; }
 #printButton:hover { background:#6c6c6c; }
 .home-link { display:inline-block; color:#808080; text-decoration:none; margin-bottom:10px; font-weight:bold; }
 .home-link:hover { text-decoration:underline; }
+.doc-link { color:#007bff; text-decoration:none; font-weight:bold; cursor:pointer; }
+.doc-link:hover { text-decoration:underline; }
 @media print {
     body>*:not(.modal){display:none!important;}
     .modal{position:static; display:block!important; background:white;}
@@ -118,41 +120,44 @@ const firebaseConfig = {
   appId: "1:663364522026:web:f48fb1ba0331695de83353"
 };
 firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
-const STATUS_OPTIONS=["Submitted","In Process","Finished"];
-let currentModalData=null;
+const db = firebase.firestore();
+const STATUS_OPTIONS = ["Submitted", "In Process", "Finished"];
+let currentModalData = null;
 
-async function loadDatabase(){
-    const tbody=document.getElementById('databaseBody');
-    const emptyMsg=document.getElementById('emptyMessage');
-    tbody.innerHTML='';
-    const statusFilter=document.getElementById('statusFilter').value.trim();
-    const snapshot=await db.collection("mpr_requests").orderBy("tanggal_dibuat","desc").get();
+async function loadDatabase() {
+    const tbody = document.getElementById('databaseBody');
+    const emptyMsg = document.getElementById('emptyMessage');
+    tbody.innerHTML = '';
+    const statusFilter = document.getElementById('statusFilter').value.trim();
+    const snapshot = await db.collection("mpr_requests").orderBy("tanggal_dibuat","desc").get();
     if(snapshot.empty){ emptyMsg.style.display='block'; return; }
-    let anyRow=false;
-    snapshot.forEach((doc)=>{
-        const data=doc.data();
-        let docStatus=(data.status||"Submitted").trim();
-        if(statusFilter!=="All" && docStatus!==statusFilter) return;
-        anyRow=true;
-        const id=doc.id;
-        const row=tbody.insertRow();
-        const materialSummary=(data.detail_material||[]).map(item=>`${item.nama_barang} (${item.jumlah} ${item.satuan})`).join(',');
-        row.insertCell(0).innerHTML=`<a class="doc-link" onclick='showDetails(${JSON.stringify({...data,id})})'>${data.nomor_dokumen}</a>`;
-        row.insertCell(1).textContent=data.tanggal_dibuat||"-";
-        row.insertCell(2).textContent=data.pemohon||"-";
-        row.insertCell(3).textContent=data.departemen||"-";
-        row.insertCell(4).textContent=data.buyer_style||"-";
-        row.insertCell(5).textContent=materialSummary||"-";
-        row.insertCell(6).textContent=docStatus;
-        row.insertCell(7).textContent=data.keterangan||"-";
+    let anyRow = false;
 
-        const actionCell=row.insertCell(8);
+    snapshot.forEach((doc)=>{
+        const data = doc.data();
+        const id = doc.id;
+        let docStatus = (data.status || "Submitted").trim();
+        if(statusFilter !== "All" && docStatus !== statusFilter) return;
+        anyRow = true;
+
+        const row = tbody.insertRow();
+        const materialSummary = (data.detail_material||[]).map(item=>`${item.nama_barang} (${item.jumlah} ${item.satuan})`).join(',');
+
+        row.insertCell(0).innerHTML = `<a class="doc-link" onclick='showDetails(${JSON.stringify({...data,id})})'>${data.nomor_dokumen}</a>`;
+        row.insertCell(1).textContent = data.tanggal_dibuat||"-";
+        row.insertCell(2).textContent = data.pemohon||"-";
+        row.insertCell(3).textContent = data.departemen||"-";
+        row.insertCell(4).textContent = data.buyer_style||"-";
+        row.insertCell(5).textContent = materialSummary||"-";
+        row.insertCell(6).textContent = docStatus;
+        row.insertCell(7).textContent = data.keterangan||"-";
+
+        const actionCell = row.insertCell(8);
         actionCell.style.textAlign="center";
-        let optionsHTML=STATUS_OPTIONS.map(s=>`<option value="${s}" ${docStatus===s?'selected':''}>${s}</option>`).join('');
-        actionCell.innerHTML=`
+        const optionsHTML = STATUS_OPTIONS.map(s=>`<option value="${s}" ${docStatus===s?'selected':''}>${s}</option>`).join('');
+        actionCell.innerHTML = `
             <div class="action-container">
-                <select class="action-select" onchange="passwordProtectedAction(()=>changeStatus('${id}',this.value))">
+                <select class="action-select" onchange="handleStatusChange(this,'${id}','${docStatus}')">
                     ${optionsHTML}
                 </select>
                 <button class="action-button" onclick="toggleAksi(this)">⚙️ Aksi</button>
@@ -163,12 +168,33 @@ async function loadDatabase(){
             </div>
         `;
     });
-    emptyMsg.style.display=anyRow?'none':'block';
+
+    emptyMsg.style.display = anyRow ? 'none' : 'block';
+}
+
+function handleStatusChange(select, id, currentStatus) {
+    const newStatus = select.value;
+    const pass = prompt("Masukkan password untuk melanjutkan:");
+    if(pass === "eland123") {
+        if(confirm(`Ubah status menjadi ${newStatus}?`)) {
+            db.collection("mpr_requests").doc(id).update({status: newStatus})
+            .then(() => loadDatabase())
+            .catch(err => alert("Gagal update status: " + err));
+        } else {
+            select.value = currentStatus; // reset ke status lama jika batal
+        }
+    } else if(pass === null){
+        alert("Aksi dibatalkan.");
+        select.value = currentStatus;
+    } else {
+        alert("Password salah!");
+        select.value = currentStatus;
+    }
 }
 
 function toggleAksi(button){
-    const aksiLain=button.parentElement.nextElementSibling;
-    aksiLain.style.display=aksiLain.style.display==="none"?"block":"none";
+    const aksiLain = button.parentElement.nextElementSibling;
+    aksiLain.style.display = aksiLain.style.display==="none"?"block":"none";
 }
 
 function passwordProtectedAction(callback){
@@ -178,14 +204,8 @@ function passwordProtectedAction(callback){
     else{ alert("Password salah!"); }
 }
 
-async function changeStatus(id,newStatus){
-    if(!confirm(`Ubah status menjadi ${newStatus}?`)) return;
-    await db.collection("mpr_requests").doc(id).update({status:newStatus});
-    loadDatabase();
-}
-
 async function editKeterangan(id,currentValue){
-    const newKet=prompt("Masukkan keterangan baru:",currentValue||"");
+    const newKet = prompt("Masukkan keterangan baru:",currentValue||"");
     if(newKet===null) return;
     await db.collection("mpr_requests").doc(id).update({keterangan:newKet});
     alert("Keterangan berhasil diperbarui.");
@@ -199,7 +219,7 @@ async function deleteRequest(id){
 }
 
 function showDetails(data){
-    currentModalData=data;
+    currentModalData = data;
     document.getElementById('modalDocNumber').textContent=data.nomor_dokumen;
     document.getElementById('modalDate').textContent=data.tanggal_dibuat||"-";
     document.getElementById('modalPemohon').textContent=data.pemohon||"-";
